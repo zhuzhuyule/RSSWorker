@@ -3,9 +3,685 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>RSSWorker - Made with ❤</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				margin: 0;
+				padding: 20px;
+				max-width: 1600px;
+				margin: 0 auto;
+				background: #f5f5f5;
+			}
+			.container {
+				display: flex;
+				gap: 20px;
+				flex-wrap: wrap;
+			}
+			.left-panel {
+				flex: 2;
+				min-width: 400px;
+				background: white;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				padding: 20px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+			.preview-panel {
+				flex: 3;
+				min-width: 600px;
+				background: white;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				padding: 20px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+			.rss-preview-panel {
+				flex: 0 0 100%;
+				margin-top: 20px;
+				background: white;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				padding: 20px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+			h1 {
+				color: #5a5af3;
+				margin-bottom: 10px;
+			}
+			h2 {
+				color: #333;
+				margin-top: 0;
+			}
+			input,
+			select {
+				width: 100%;
+				padding: 10px;
+				margin-bottom: 12px;
+				border: 1px solid #ddd;
+				border-radius: 6px;
+				font-size: 14px;
+			}
+			input:focus,
+			select:focus {
+				outline: none;
+				border-color: #7c4dff;
+				box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.1);
+			}
+			button {
+				background-color: #7c4dff;
+				color: white;
+				border: none;
+				padding: 10px 15px;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 14px;
+				transition: all 0.2s;
+			}
+			button:hover {
+				background-color: #6c3ee8;
+				transform: translateY(-1px);
+			}
+			.selector-group {
+				margin-bottom: 20px;
+				background: #fafafa;
+				padding: 15px;
+				border-radius: 6px;
+			}
+			.format-group {
+				background-color: #f8f8f8;
+				padding: 15px;
+				border-radius: 6px;
+				margin-bottom: 20px;
+			}
+			.format-group h3 {
+				margin-top: 0;
+				color: #444;
+				font-size: 16px;
+				margin-bottom: 12px;
+			}
+			.json-view {
+				background: #1e1e1e;
+				color: #d4d4d4;
+				padding: 20px;
+				border-radius: 6px;
+				font-family: 'Monaco', 'Menlo', monospace;
+				font-size: 13px;
+				overflow-x: auto;
+				white-space: pre-wrap;
+				word-break: break-all;
+				margin-bottom: 20px;
+			}
+			.xml-view {
+				background: #1e1e1e;
+				color: #d4d4d4;
+				padding: 20px;
+				border-radius: 6px;
+				font-family: 'Monaco', 'Menlo', monospace;
+				font-size: 13px;
+				overflow-x: auto;
+				white-space: pre-wrap;
+				word-break: break-all;
+				max-height: 600px;
+				overflow-y: auto;
+			}
+			.xml-view pre {
+				margin: 0;
+				font-family: 'Monaco', 'Menlo', monospace;
+				line-height: 1.5;
+				white-space: pre-wrap;
+				word-break: break-all;
+			}
+			/* 自定义滚动条样式 */
+			.xml-view::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			.xml-view::-webkit-scrollbar-track {
+				background: #2d2d2d;
+				border-radius: 4px;
+			}
+			.xml-view::-webkit-scrollbar-thumb {
+				background: #555;
+				border-radius: 4px;
+			}
+			.xml-view::-webkit-scrollbar-thumb:hover {
+				background: #777;
+			}
+			/* XML语法高亮 - 保留但不使用 */
+			.xml-tag {
+				color: #569cd6;
+			}
+			.xml-attr {
+				color: #9cdcfe;
+			}
+			.xml-val {
+				color: #ce9178;
+			}
+			.xml-comment {
+				color: #6a9955;
+			}
+			.xml-cdata {
+				color: #d4d4d4;
+			}
+			.rss-preview {
+				background: #f8f8f8;
+				padding: 15px;
+				border-radius: 6px;
+				margin-top: 20px;
+			}
+			.rss-preview h3 {
+				margin-top: 0;
+				color: #444;
+				font-size: 16px;
+				margin-bottom: 12px;
+			}
+			.rss-item {
+				padding: 10px;
+				border-bottom: 1px solid #eee;
+			}
+			.rss-item:last-child {
+				border-bottom: none;
+			}
+			.rss-item-title {
+				font-weight: bold;
+				margin-bottom: 5px;
+			}
+			.rss-item-link {
+				color: #7c4dff;
+				text-decoration: none;
+				word-break: break-all;
+			}
+			.rss-item-link:hover {
+				text-decoration: underline;
+			}
+			label {
+				display: block;
+				margin-bottom: 6px;
+				color: #555;
+				font-weight: 500;
+			}
+			.suggestion-item {
+				padding: 10px;
+				cursor: pointer;
+				border-bottom: 1px solid #eee;
+				transition: background-color 0.2s;
+			}
+			.suggestion-item:hover {
+				background-color: #f0f0f0;
+			}
+			.delete-history {
+				background: #ff4444;
+				padding: 4px 8px;
+				font-size: 12px;
+			}
+			.delete-history:hover {
+				background: #ff2020;
+			}
+			#urlSuggestions {
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				border: 1px solid #ddd;
+				border-radius: 6px;
+				margin-top: 4px;
+			}
+			#generateFeed {
+				background-color: #4caf50;
+			}
+			#generateFeed:hover {
+				background-color: #43a047;
+			}
+			.intro {
+				margin-bottom: 20px;
+				color: #666;
+			}
+			.intro a {
+				color: #7c4dff;
+				text-decoration: none;
+			}
+			.intro a:hover {
+				text-decoration: underline;
+			}
+			/* 切换按钮样式 */
+			#switchRssFormat {
+				background-color: #ff9800;
+			}
+			#switchRssFormat:hover {
+				background-color: #f57c00;
+			}
+			#copyRss {
+				background-color: #2196f3;
+			}
+			#copyRss:hover {
+				background-color: #1976d2;
+			}
+		</style>
 	</head>
 	<body>
-		<h1>RSSWorker - Made with ❤</h1>
-		<p>See <a href="https://github.com/yllhwa/RSSWorker">GitHub</a> for more information.</p>
+		<h1>RSSWorker - 解析预览工具</h1>
+		<p class="intro">输入URL，获取解析结果。访问 <a href="https://github.com/yllhwa/RSSWorker">GitHub</a> 获取更多信息。</p>
+
+		<div class="container">
+			<div class="left-panel">
+				<div class="input-section">
+					<label for="pageUrl">输入页面URL</label>
+					<div style="display: flex; flex-direction: column; gap: 8px">
+						<div style="display: flex; gap: 8px">
+							<select id="requestMethod" style="width: 80px; margin: 0">
+								<option value="GET">GET</option>
+							</select>
+							<div style="position: relative; flex-grow: 1">
+								<input type="text" id="pageUrl" placeholder="https://example.com" style="margin: 0" />
+								<div
+									id="urlSuggestions"
+									style="
+										display: none;
+										position: absolute;
+										width: 100%;
+										max-height: 300px;
+										overflow-y: auto;
+										background: white;
+										z-index: 1000;
+									"
+								></div>
+							</div>
+						</div>
+						<div style="display: flex; gap: 8px">
+							<input type="text" id="urlNote" placeholder="添加备注（可选）" style="margin: 0" />
+							<button id="saveNote" style="white-space: nowrap">保存备注</button>
+						</div>
+					</div>
+
+					<div style="margin-top: 15px; display: flex; gap: 10px">
+						<button id="previewBtn">预览</button>
+						<button id="clearParamsBtn">清理参数</button>
+					</div>
+				</div>
+
+				<div class="selector-options" style="margin-top: 25px">
+					<div class="selector-group">
+						<label for="areaSelector">解析区域选择器 (CSS)</label>
+						<input type="text" id="areaSelector" placeholder="body" />
+
+						<label for="itemSelector">元素选择器 (CSS)</label>
+						<input type="text" id="itemSelector" placeholder="a" />
+
+						<label for="filter">筛选条件</label>
+						<input type="text" id="filter" placeholder="magnet" />
+					</div>
+
+					<div class="format-group">
+						<h3>名字格式化</h3>
+						<label for="formatRegex">匹配正则</label>
+						<input type="text" id="formatRegex" placeholder="例如: (S\d+E\d+)|(第\d+集)" />
+
+						<label for="formatReplace">替换内容</label>
+						<input type="text" id="formatReplace" placeholder="留空则删除匹配内容" />
+					</div>
+
+					<div class="format-group">
+						<h3>RSS频道信息</h3>
+						<label for="feedTitle">频道标题</label>
+						<input type="text" id="feedTitle" placeholder="留空则使用第一个项目的标题" />
+
+						<label for="feedDescription">频道描述</label>
+						<input type="text" id="feedDescription" placeholder="RSS频道的描述信息" />
+					</div>
+				</div>
+			</div>
+
+			<div class="preview-panel">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
+					<h2>JSON结果</h2>
+					<button id="generateFeed">生成RSS订阅</button>
+				</div>
+				<div class="json-view"><div id="jsonResults">点击"预览"按钮查看解析结果</div></div>
+			</div>
+
+			<div class="rss-preview-panel">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
+					<h2>RSS预览</h2>
+					<div>
+						<button id="switchRssFormat" style="margin-right: 10px">切换格式</button>
+						<button id="copyRss">复制RSS内容</button>
+					</div>
+				</div>
+				<div class="xml-view"><pre id="rssContent">点击"预览"按钮查看RSS内容</pre></div>
+			</div>
+		</div>
+
+		<script>
+			// 获取所有输入参数
+			function getParams() {
+				return {
+					area: document.getElementById('areaSelector').value,
+					selector: document.getElementById('itemSelector').value,
+					filter: document.getElementById('filter').value,
+					formatRegex: document.getElementById('formatRegex').value,
+					formatReplace: document.getElementById('formatReplace').value,
+					title: document.getElementById('feedTitle').value,
+					description: document.getElementById('feedDescription').value,
+				};
+			}
+
+			// 设置所有输入参数
+			function setParams(params) {
+				if (!params) return;
+				document.getElementById('areaSelector').value = params.area || '';
+				document.getElementById('itemSelector').value = params.selector || '';
+				document.getElementById('filter').value = params.filter || '';
+				document.getElementById('formatRegex').value = params.formatRegex || '';
+				document.getElementById('formatReplace').value = params.formatReplace || '';
+				document.getElementById('feedTitle').value = params.title || '';
+				document.getElementById('feedDescription').value = params.description || '';
+			}
+
+			// 清理所有输入参数
+			function clearParams() {
+				document.getElementById('pageUrl').value = '';
+				document.getElementById('areaSelector').value = '';
+				document.getElementById('itemSelector').value = '';
+				document.getElementById('filter').value = '';
+				document.getElementById('formatRegex').value = '';
+				document.getElementById('formatReplace').value = '';
+				document.getElementById('feedTitle').value = '';
+				document.getElementById('feedDescription').value = '';
+			}
+
+			// 从URL中提取域名和路径模式
+			function getUrlPattern(url) {
+				try {
+					const urlObj = new URL(url);
+					return urlObj.hostname + urlObj.pathname.split('/').slice(0, -1).join('/');
+				} catch (e) {
+					return '';
+				}
+			}
+
+			// 存储参数到本地存储
+			function saveParamsForUrl(url, params) {
+				const urlPattern = getUrlPattern(url);
+				if (!urlPattern) return;
+
+				const savedPatterns = JSON.parse(localStorage.getItem('urlPatterns') || '{}');
+				savedPatterns[urlPattern] = params;
+				localStorage.setItem('urlPatterns', JSON.stringify(savedPatterns));
+			}
+
+			// 获取URL对应的存储参数
+			function getParamsForUrl(url) {
+				const urlPattern = getUrlPattern(url);
+				if (!urlPattern) return null;
+
+				const savedPatterns = JSON.parse(localStorage.getItem('urlPatterns') || '{}');
+				return savedPatterns[urlPattern];
+			}
+
+			// 历史记录相关函数
+			function getUrlHistory() {
+				return JSON.parse(localStorage.getItem('urlHistory') || '[]');
+			}
+
+			function saveUrlHistory(url, note = '') {
+				const history = getUrlHistory();
+				const existingIndex = history.findIndex((item) => item.url === url);
+
+				if (existingIndex !== -1) {
+					// 更新已存在的记录
+					if (note) {
+						history[existingIndex].note = note;
+					}
+					// 移动到顶部
+					const item = history.splice(existingIndex, 1)[0];
+					history.unshift(item);
+				} else {
+					// 添加新记录
+					history.unshift({ url, note, timestamp: Date.now() });
+				}
+
+				// 限制历史记录数量
+				if (history.length > 20) {
+					history.pop();
+				}
+
+				localStorage.setItem('urlHistory', JSON.stringify(history));
+				updateUrlSuggestions('');
+			}
+
+			function updateUrlSuggestions(input) {
+				const suggestionsDiv = document.getElementById('urlSuggestions');
+				const history = getUrlHistory();
+
+				if (!history.length) {
+					suggestionsDiv.style.display = 'none';
+					return;
+				}
+
+				const matches = input
+					? history.filter(
+							(item) =>
+								item.url.toLowerCase().includes(input.toLowerCase()) || (item.note && item.note.toLowerCase().includes(input.toLowerCase()))
+					  )
+					: history;
+
+				if (!matches.length) {
+					suggestionsDiv.style.display = 'none';
+					return;
+				}
+
+				suggestionsDiv.innerHTML = matches
+					.map(
+						(item) => `
+					<div class="suggestion-item" style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;" data-url="${
+						item.url
+					}">
+						<div style="overflow: hidden; text-overflow: ellipsis;">
+							<div style="font-weight: bold;">${item.url}</div>
+							${item.note ? `<div style="color: #666; font-size: 0.9em;">${item.note}</div>` : ''}
+						</div>
+						<button class="delete-history" style="padding: 2px 6px; background: #ff4444; color: white; border: none; border-radius: 3px; margin-left: 8px;">删除</button>
+					</div>
+				`
+					)
+					.join('');
+
+				suggestionsDiv.style.display = 'block';
+
+				// 点击建议项
+				suggestionsDiv.querySelectorAll('.suggestion-item').forEach((item) => {
+					item.addEventListener('click', (e) => {
+						if (!e.target.classList.contains('delete-history')) {
+							document.getElementById('pageUrl').value = item.dataset.url;
+							suggestionsDiv.style.display = 'none';
+							// 加载关联的参数
+							const params = getParamsForUrl(item.dataset.url);
+							if (params) {
+								setParams(params);
+							}
+						}
+					});
+				});
+
+				// 删除历史记录
+				suggestionsDiv.querySelectorAll('.delete-history').forEach((btn) => {
+					btn.addEventListener('click', (e) => {
+						e.stopPropagation();
+						const url = e.target.closest('.suggestion-item').dataset.url;
+						const history = getUrlHistory().filter((item) => item.url !== url);
+						localStorage.setItem('urlHistory', JSON.stringify(history));
+						updateUrlSuggestions(document.getElementById('pageUrl').value);
+					});
+				});
+			}
+
+			// URL输入框事件处理
+			document.getElementById('pageUrl').addEventListener('input', (e) => {
+				const url = e.target.value;
+				updateUrlSuggestions(url);
+				const params = getParamsForUrl(url);
+				if (params) {
+					setParams(params);
+				}
+			});
+
+			// URL输入框获得焦点时显示历史记录
+			document.getElementById('pageUrl').addEventListener('focus', () => {
+				updateUrlSuggestions('');
+			});
+
+			// 点击页面其他地方关闭建议列表
+			document.addEventListener('click', (e) => {
+				if (!e.target.closest('#urlSuggestions') && !e.target.closest('#pageUrl')) {
+					document.getElementById('urlSuggestions').style.display = 'none';
+				}
+			});
+
+			// 保存备注按钮
+			document.getElementById('saveNote').addEventListener('click', () => {
+				const url = document.getElementById('pageUrl').value;
+				const note = document.getElementById('urlNote').value;
+				if (url) {
+					saveUrlHistory(url, note);
+					alert('备注已保存');
+				} else {
+					alert('请先输入URL');
+				}
+			});
+
+			let xml = '';
+			// 修改预览按钮事件
+			document.getElementById('previewBtn').addEventListener('click', async () => {
+				const pageUrl = document.getElementById('pageUrl').value;
+				if (!pageUrl) {
+					alert('请输入URL');
+					return;
+				}
+
+				// 保存到历史记录
+				saveUrlHistory(pageUrl);
+
+				// 保存当前参数
+				saveParamsForUrl(pageUrl, getParams());
+
+				const area = document.getElementById('areaSelector').value || 'body';
+				const selector = document.getElementById('itemSelector').value || 'a';
+				const filter = document.getElementById('filter').value;
+				const formatRegex = document.getElementById('formatRegex').value;
+				const formatReplace = document.getElementById('formatReplace').value;
+				const title = document.getElementById('feedTitle').value;
+				const description = document.getElementById('feedDescription').value;
+
+				const getUrl = (type) => {
+					return `/parse/${encodeURIComponent(pageUrl)}?type=${type}&area=${encodeURIComponent(area)}&selector=${encodeURIComponent(
+						selector
+					)}${filter ? `&filter=${encodeURIComponent(filter)}` : ''}${
+						formatRegex ? `&formatRegex=${encodeURIComponent(formatRegex)}` : ''
+					}${formatReplace ? `&formatReplace=${encodeURIComponent(formatReplace)}` : ''}${
+						title ? `&title=${encodeURIComponent(title)}` : ''
+					}${description ? `&description=${encodeURIComponent(description)}` : ''}`;
+				};
+				// 构建API URL
+				const apiUrl = getUrl('json');
+
+				try {
+					const response = await fetch(apiUrl);
+					if (!response.ok) {
+						throw new Error(`HTTP错误: ${response.status}`);
+					}
+
+					const data = await response.json();
+					xml = data.xml;
+					delete data.xml;
+
+					// 格式化显示JSON
+					document.getElementById('jsonResults').textContent = JSON.stringify(data, null, 2);
+
+					// 更新RSS预览
+					if (xml) {
+						// 原样显示XML内容，不进行任何转义
+						document.getElementById('rssContent').textContent = xml;
+					} else {
+						document.getElementById('rssContent').textContent = '暂无内容';
+					}
+				} catch (error) {
+					document.getElementById('jsonResults').textContent = JSON.stringify({
+						error: error.message,
+					});
+					document.getElementById('rssContent').textContent = '解析出错';
+				}
+			});
+
+			// 清理参数按钮
+			document.getElementById('clearParamsBtn').addEventListener('click', clearParams);
+
+			// 生成RSS订阅链接
+			document.getElementById('generateFeed').addEventListener('click', () => {
+				const pageUrl = document.getElementById('pageUrl').value;
+				if (!pageUrl) {
+					alert('请先输入URL并预览');
+					return;
+				}
+
+				const area = document.getElementById('areaSelector').value || 'body';
+				const selector = document.getElementById('itemSelector').value || 'a';
+				const filter = document.getElementById('filter').value;
+				const formatRegex = document.getElementById('formatRegex').value;
+				const formatReplace = document.getElementById('formatReplace').value;
+				const title = document.getElementById('feedTitle').value;
+				const description = document.getElementById('feedDescription').value;
+
+				// 构建RSS URL
+				const rssUrl =
+					location.origin +
+					`/parse/${encodeURIComponent(pageUrl)}?area=${encodeURIComponent(area)}&selector=${encodeURIComponent(selector)}${
+						filter ? `&filter=${encodeURIComponent(filter)}` : ''
+					}${formatRegex ? `&formatRegex=${encodeURIComponent(formatRegex)}` : ''}${
+						formatReplace ? `&formatReplace=${encodeURIComponent(formatReplace)}` : ''
+					}${title ? `&title=${encodeURIComponent(title)}` : ''}${description ? `&description=${encodeURIComponent(description)}` : ''}`;
+
+				// 打开新窗口
+				window.open(rssUrl, '_blank');
+			});
+
+			// 添加复制RSS内容按钮事件
+			document.getElementById('copyRss').addEventListener('click', () => {
+				const rssContent = document.getElementById('rssContent').textContent;
+				navigator.clipboard
+					.writeText(rssContent)
+					.then(() => alert('RSS内容已复制到剪贴板'))
+					.catch((err) => alert('无法复制内容: ' + err));
+			});
+
+			// 切换RSS格式按钮
+			document.getElementById('switchRssFormat').addEventListener('click', () => {
+				const rssContent = document.getElementById('rssContent');
+				const currentContent = rssContent.textContent;
+
+				if (
+					!currentContent ||
+					currentContent === '点击"预览"按钮查看RSS内容' ||
+					currentContent === '暂无内容' ||
+					currentContent === '解析出错'
+				) {
+					return;
+				}
+
+				try {
+					// 检查是否已经格式化
+					if (currentContent.includes('\n  ')) {
+						// 已格式化，切换回原始格式
+						rssContent.textContent = currentContent.replace(/\n\s+/g, '').replace(/>\s*</g, '><');
+					} else {
+						// 未格式化，添加格式化
+						rssContent.textContent = xml;
+					}
+				} catch (e) {
+					console.error('格式化XML失败:', e);
+					// 如果格式化失败，保持原样
+				}
+			});
+		</script>
 	</body>
 </html>

@@ -66,3 +66,13 @@ let data = {
 ## 致谢
 
 - [RSSHub](https://github.com/DIYgod/RSSHub) 灵感和部分代码来源
+
+// 使用 HTMLRewriter 提取链接
+const links = [];
+return new HTMLRewriter()
+  .on('a[href]', {
+    element(element) {
+      links.push(element.getAttribute('href'));
+    }
+  })
+  .transform(originalResponse);

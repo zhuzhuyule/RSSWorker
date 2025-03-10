@@ -7,10 +7,12 @@ import errorHtml from './html/err.html';
 import robotsTxt from './robots.txt';
 
 import route from './route';
+import parse from './parse';
 
 const app = new Hono();
 
 app.route('/rss', route);
+app.route('/parse', parse);
 app.get('/', (ctx) => {
 	return ctx.html(indexHtml);
 });
