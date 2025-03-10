@@ -335,7 +335,7 @@
 			<div class="preview-panel">
 				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
 					<h2>JSON结果</h2>
-					<button id="generateFeed">生成RSS订阅</button>
+					<button id="generateFeed">复制RSS链接</button>
 				</div>
 				<div class="json-view"><div id="jsonResults">点击"预览"按钮查看解析结果</div></div>
 			</div>
@@ -616,7 +616,7 @@
 			// 清理参数按钮
 			document.getElementById('clearParamsBtn').addEventListener('click', clearParams);
 
-			// 生成RSS订阅链接
+			// 复制RSS链接
 			document.getElementById('generateFeed').addEventListener('click', () => {
 				const pageUrl = document.getElementById('pageUrl').value;
 				if (!pageUrl) {
@@ -641,8 +641,14 @@
 						formatReplace ? `&formatReplace=${encodeURIComponent(formatReplace)}` : ''
 					}${title ? `&title=${encodeURIComponent(title)}` : ''}${description ? `&description=${encodeURIComponent(description)}` : ''}`;
 
-				// 打开新窗口
-				window.open(rssUrl, '_blank');
+				// 复制到剪贴板
+				navigator.clipboard
+					.writeText(rssUrl)
+					.then(() => alert('RSS链接已复制到剪贴板'))
+					.catch((err) => {
+						alert('无法复制链接: ' + err);
+						window.open(rssUrl, '_blank');
+					});
 			});
 
 			// 添加复制RSS内容按钮事件
